@@ -154,18 +154,18 @@ config.keys = {
   
   -- Tab management
   { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab 'CurrentPaneDomain' },
-  { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = true } },
+  { key = 'X', mods = 'ALT', action = act.CloseCurrentTab { confirm = true } },
   { key = 'Tab', mods = 'CTRL', action = act.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(-1) },
   
   -- Pane management with Alt as modifier (less conflicts)
-  { key = '|', mods = 'ALT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
+  { key = '-', mods = 'ALT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
   { key = '\\', mods = 'ALT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
   { key = 'h', mods = 'ALT', action = act.ActivatePaneDirection 'Left' },
   { key = 'j', mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
   { key = 'k', mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
   { key = 'l', mods = 'ALT', action = act.ActivatePaneDirection 'Right' },
-  { key = 'x', mods = 'ALT', action = act.CloseCurrentPane { confirm = true } },
+  { key = 'x', mods = 'ALT', action = act.CloseCurrentPane { confirm = false } },
   { key = 'z', mods = 'ALT', action = act.TogglePaneZoomState },
   
   -- Pane resizing with Alt+Shift
@@ -185,7 +185,6 @@ config.keys = {
   { key = 's', mods = 'ALT', action = act.AttachDomain('goertek-server') },
   
   -- Quick window management
-  { key = 'n', mods = 'CTRL|SHIFT', action = act.SpawnWindow },
   { key = 'q', mods = 'CTRL|SHIFT', action = act.QuitApplication },
   
   -- Tab navigation with Alt+Number
