@@ -18,7 +18,7 @@ config.font = wezterm.font_with_fallback {
   'Consolas',          -- Windows fallback font
   'Microsoft YaHei UI',-- Chinese character fallback
 }
-config.font_size = 12.0
+config.font_size = 10.0
 config.line_height = 1.0
 config.freetype_load_target = "Light"  -- Smoother font rendering
 config.freetype_render_target = "Normal"
@@ -116,90 +116,104 @@ config.cursor_thickness = 1.5
 -------------------------------------------------------------------------------
 -- SECTION 5: DEFAULT SHELL AND SSH DOMAINS
 -------------------------------------------------------------------------------
-config.default_prog = { 'ubuntu1804.exe' }
+config.default_prog = { "E:\\Tool\\msys64\\usr\\bin\\zsh.exe -l" }
 
 -- SSH domains configuration
 config.ssh_domains = {
   {
     name = 'goertek-server',
-    remote_address = '192.168.1.100',
+    remote_address = '10.10.204.47:22',
     username = 'jiangmingxing',
+    multiplexing = 'None',
+    ssh_option = {
+        identityfile = "C:\\Users\\astor.jiang\\.ssh\\id_rsa_gtk_service",
+    }
   },
 }
 
 -------------------------------------------------------------------------------
--- SECTION 6: KEY BINDINGS
+-- SECTION 6: KEY BINDINGS (Nvim/Tmux Compatible)
 -------------------------------------------------------------------------------
-config.leader = { key = 'Space', mods = 'CTRL|SHIFT', timeout_milliseconds = 1000 }
+
+-- Use Alt as leader key instead of Ctrl+Shift+Space to avoid conflicts
+config.leader = { key = 'a', mods = 'ALT', timeout_milliseconds = 2000 }
+
+-- Disable default key bindings to avoid conflicts
+config.disable_default_key_bindings = true
 
 config.keys = {
-  -- Clipboard operations
-  { key = 'c', mods = 'CTRL|SHIFT', action = act.CopyTo 'Clipboard' },
-  { key = 'v', mods = 'CTRL|SHIFT', action = act.PasteFrom 'Clipboard' },
+  -- Copy and paste (standard system shortcuts)
+  { key = 'c', mods = 'CTRL', action = act.CopyTo 'Clipboard' },
+  { key = 'v', mods = 'CTRL', action = act.PasteFrom 'Clipboard' },
   { key = 'Insert', mods = 'SHIFT', action = act.PasteFrom 'Clipboard' },
+  
+  -- Font size (common terminal shortcuts)
+  { key = '+', mods = 'CTRL', action = act.IncreaseFontSize },
+  { key = '-', mods = 'CTRL', action = act.DecreaseFontSize },
+  { key = '0', mods = 'CTRL', action = act.ResetFontSize },
   
   -- Tab management
   { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab 'CurrentPaneDomain' },
-  { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = false } },
+  { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = true } },
   { key = 'Tab', mods = 'CTRL', action = act.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(-1) },
   
-  -- Pane management
-  { key = '"', mods = 'CTRL|SHIFT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
-  { key = '%', mods = 'CTRL|SHIFT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'h', mods = 'CTRL|SHIFT', action = act.ActivatePaneDirection 'Left' },
-  { key = 'j', mods = 'CTRL|SHIFT', action = act.ActivatePaneDirection 'Down' },
-  { key = 'k', mods = 'CTRL|SHIFT', action = act.ActivatePaneDirection 'Up' },
-  { key = 'l', mods = 'CTRL|SHIFT', action = act.ActivatePaneDirection 'Right' },
-  { key = 'LeftArrow', mods = 'CTRL|SHIFT', action = act.AdjustPaneSize { 'Left', 5 } },
-  { key = 'DownArrow', mods = 'CTRL|SHIFT', action = act.AdjustPaneSize { 'Down', 5 } },
-  { key = 'UpArrow', mods = 'CTRL|SHIFT', action = act.AdjustPaneSize { 'Up', 5 } },
-  { key = 'RightArrow', mods = 'CTRL|SHIFT', action = act.AdjustPaneSize { 'Right', 5 } },
+  -- Pane management with Alt as modifier (less conflicts)
+  { key = '|', mods = 'ALT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
+  { key = '\\', mods = 'ALT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'h', mods = 'ALT', action = act.ActivatePaneDirection 'Left' },
+  { key = 'j', mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
+  { key = 'k', mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
+  { key = 'l', mods = 'ALT', action = act.ActivatePaneDirection 'Right' },
+  { key = 'x', mods = 'ALT', action = act.CloseCurrentPane { confirm = true } },
+  { key = 'z', mods = 'ALT', action = act.TogglePaneZoomState },
+  
+  -- Pane resizing with Alt+Shift
+  { key = 'h', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Left', 5 } },
+  { key = 'j', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Down', 5 } },
+  { key = 'k', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Up', 5 } },
+  { key = 'l', mods = 'ALT|SHIFT', action = act.AdjustPaneSize { 'Right', 5 } },
   
   -- Configuration and utilities
   { key = 'r', mods = 'CTRL|SHIFT', action = act.ReloadConfiguration },
-  { key = 'p', mods = 'CTRL|SHIFT', action = act.ShowLauncher },
-  { key = 'P', mods = 'CTRL|SHIFT', action = act.ActivateCommandPalette },
+  { key = ',', mods = 'CTRL|SHIFT', action = act.ShowLauncher },
+  { key = 'p', mods = 'CTRL|SHIFT', action = act.ActivateCommandPalette },
   { key = 'F11', mods = 'NONE', action = act.ToggleFullScreen },
+  { key = 'Enter', mods = 'ALT', action = act.ToggleFullScreen },
   
-  -- SSH connection shortcut
-  { key = 'P', mods = 'LEADER', action = act.AttachDomain('goertek-server') },
+  -- SSH connection
+  { key = 's', mods = 'ALT', action = act.AttachDomain('goertek-server') },
   
-  -- Tab navigation with number keys
-  { key = '1', mods = 'LEADER', action = act.ActivateTab(0) },
-  { key = '2', mods = 'LEADER', action = act.ActivateTab(1) },
-  { key = '3', mods = 'LEADER', action = act.ActivateTab(2) },
-  { key = '4', mods = 'LEADER', action = act.ActivateTab(3) },
-  { key = '5', mods = 'LEADER', action = act.ActivateTab(4) },
-  { key = '6', mods = 'LEADER', action = act.ActivateTab(5) },
-  { key = '7', mods = 'LEADER', action = act.ActivateTab(6) },
-  { key = '8', mods = 'LEADER', action = act.ActivateTab(7) },
-  { key = '9', mods = 'LEADER', action = act.ActivateTab(8) },
-  { key = '0', mods = 'LEADER', action = act.ActivateTab(9) },
+  -- Quick window management
+  { key = 'n', mods = 'CTRL|SHIFT', action = act.SpawnWindow },
+  { key = 'q', mods = 'CTRL|SHIFT', action = act.QuitApplication },
   
-  -- Tab renaming shortcut
-  {
-    key = 'r',
-    mods = 'LEADER',
-    action = act.PromptInputLine {
-      description = 'Enter new tab name:',
-      action = wezterm.action_callback(function(window, pane, line)
-        if line and #line > 0 then
-          window:active_tab():set_title(line)
-        end
-      end),
-    },
-  },
+  -- Tab navigation with Alt+Number
+  { key = '1', mods = 'ALT', action = act.ActivateTab(0) },
+  { key = '2', mods = 'ALT', action = act.ActivateTab(1) },
+  { key = '3', mods = 'ALT', action = act.ActivateTab(2) },
+  { key = '4', mods = 'ALT', action = act.ActivateTab(3) },
+  { key = '5', mods = 'ALT', action = act.ActivateTab(4) },
+  { key = '6', mods = 'ALT', action = act.ActivateTab(5) },
+  { key = '7', mods = 'ALT', action = act.ActivateTab(6) },
+  { key = '8', mods = 'ALT', action = act.ActivateTab(7) },
+  { key = '9', mods = 'ALT', action = act.ActivateTab(8) },
+  { key = '0', mods = 'ALT', action = act.ActivateTab(-1) },  -- Last tab
   
-  -- Create new window
-  { key = 'n', mods = 'LEADER', action = act.SpawnWindow },
+  -- Copy mode (Vim-like, not conflicting with tmux)
+  { key = '[', mods = 'CTRL', action = act.ActivateCopyMode },
   
-  -- Copy mode (like tmux)
-  { key = '[', mods = 'LEADER', action = act.ActivateCopyMode },
-  { key = ']', mods = 'LEADER', action = act.PasteFrom 'Clipboard' },
+  -- Search
+  { key = 'f', mods = 'CTRL', action = act.Search { CaseSensitiveString = '' } },
+  { key = 'n', mods = 'CTRL', action = act.ActivateCopyMode },
+  { key = 'N', mods = 'CTRL|SHIFT', action = act.CopyMode 'NextMatch' },
   
-  -- Search mode
-  { key = '/', mods = 'LEADER', action = act.Search { CaseSensitiveString = '' } },
+  -- Clear terminal
+  { key = 'l', mods = 'CTRL', action = act.ClearScrollback 'ScrollbackOnly' },
+  { key = 'k', mods = 'CTRL|SHIFT', action = act.ClearScrollback 'ScrollbackAndViewport' },
+  
+  -- Quick actions
+  { key = 'd', mods = 'ALT', action = act.ShowDebugOverlay },
 }
 
 -------------------------------------------------------------------------------
@@ -236,7 +250,6 @@ config.launch_menu = {
 -- SECTION 8: MOUSE AND INPUT SETTINGS
 -------------------------------------------------------------------------------
 config.enable_kitty_keyboard = true
-config.disable_default_key_bindings = false
 config.swallow_mouse_click_on_pane_focus = true
 config.swallow_mouse_click_on_window_focus = true
 
@@ -269,6 +282,18 @@ config.mouse_bindings = {
     event = { Down = { streak = 1, button = 'Right' } },
     mods = 'NONE',
     action = act.PasteFrom 'Clipboard',
+  },
+  -- Double click to select word
+  {
+    event = { Down = { streak = 2, button = 'Left' } },
+    mods = 'NONE',
+    action = act.SelectTextAtMouseCursor 'Word',
+  },
+  -- Triple click to select line
+  {
+    event = { Down = { streak = 3, button = 'Left' } },
+    mods = 'NONE',
+    action = act.SelectTextAtMouseCursor 'Line',
   },
 }
 
@@ -310,36 +335,68 @@ local function get_shell_type(process_name)
     return "bash"
   elseif proc_lower:find("ssh") then
     return "ssh"
+  elseif proc_lower:find("zsh") then
+    return "zsh"
   else
     return "term"
   end
 end
 
--- Rounded tab formatter - fixed color issues
-wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
+-- Get meaningful tab title
+local function get_tab_title(tab)
+  -- Use user-set tab title if available
+  if tab.tab_title and #tab.tab_title > 0 then
+    return tab.tab_title
+  end
+  
   local pane = tab.active_pane
+  local title = pane.title
   
-  -- Get process name
-  local process_name = ""
-  local proc_success, proc = pcall(function()
-    return pane:get_foreground_process_name()
-  end)
-  if proc_success then
-    process_name = proc
+  -- If title is default (like "zsh" or "bash"), try to get more meaningful title
+  if title == "zsh" or title == "bash" or title == "cmd.exe" or title == "powershell.exe" then
+    -- Try to get process info
+    local success, proc = pcall(function()
+      return pane:get_foreground_process_name()
+    end)
+    
+    if success and proc then
+      local proc_name = proc:match("([^/\\]+)$") or proc
+      -- If process is zsh/bash, try to get current directory
+      if proc_name:find("zsh") or proc_name:find("bash") then
+        local dir = pane.current_working_dir
+        if dir then
+          -- Extract directory name
+          local dir_name = dir:match("([^/\\]+)$") or dir
+          if dir_name and #dir_name > 0 then
+            return "zsh: " .. dir_name
+          end
+        end
+      end
+      return proc_name
+    end
+    
+    -- Check if SSH connection
+    if pane.domain_name and pane.domain_name ~= "local" then
+      return "ssh: " .. pane.domain_name
+    end
   end
   
-  -- Get shell type
-  local shell_type = get_shell_type(process_name)
-  local display_text = shell_type
+  return title
+end
+
+-- Powerline rounded corner characters
+local left_corner = ""  -- Powerline left rounded corner
+local right_corner = "" -- Powerline right rounded corner
+
+-- Rounded tab formatter
+wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
+  local title = get_tab_title(tab)
   
-  -- Ensure minimum width
-  if #display_text < 20 then
-    display_text = display_text .. string.rep(" ", 20 - #display_text)
+  -- Truncate long titles
+  local max_title_length = 25
+  if #title > max_title_length then
+    title = title:sub(1, max_title_length - 3) .. "..."
   end
-  
-  -- Powerline rounded corner characters
-  local left_corner = ""  -- Powerline left rounded corner
-  local right_corner = "" -- Powerline right rounded corner
   
   if tab.is_active then
     -- Active tab: orange background, black text, rounded corners
@@ -352,7 +409,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
       -- Tab content: orange background, black text
       { Background = { Color = "#FF8C00" } },    -- Orange background
       { Foreground = { Color = "#000000" } },    -- Black text
-      { Text = " " .. display_text .. " " },
+      { Text = " " .. title .. " " },
       
       -- Right corner: transition from orange to tab bar background
       { Foreground = { Color = "#FF8C00" } },    -- Orange foreground (triangle color) 
@@ -370,7 +427,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
       -- Tab content: dark blue-gray background, purple text
       { Background = { Color = "#1a1a2e" } },    -- Dark blue-gray background
       { Foreground = { Color = "#666699" } },    -- Purple text
-      { Text = " " .. display_text .. " " },
+      { Text = " " .. title .. " " },
       
       -- Right corner: transition from dark blue-gray to tab bar background
       { Foreground = { Color = "#1a1a2e" } },    -- Dark blue-gray foreground (triangle color)
@@ -380,10 +437,171 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
   end
 end)
 
--- Dynamically update pane title
+-- Update pane title with more info
 wezterm.on('update-title', function(window, pane, title)
-  pane:set_title(pane:get_title())
+  local cwd = pane.current_working_dir
+  local domain = pane.domain_name
+  
+  -- For SSH connections, show remote host info
+  if domain and domain ~= "local" then
+    pane:set_title("ssh: " .. domain)
+  -- For local shell, show current directory
+  elseif cwd then
+    local dir_name = cwd:match("([^/\\]+)$")
+    if dir_name then
+      pane:set_title(dir_name)
+    else
+      pane:set_title(title)
+    end
+  else
+    pane:set_title(title)
+  end
 end)
+
+-- Update title when pane is activated
+wezterm.on('activate-pane', function(window, pane)
+  wezterm.emit('update-title', window, pane, pane.title)
+end)
+
+-------------------------------------------------------------------------------
+-- SECTION 11: SET DEFAULT PANE TITLES
+-------------------------------------------------------------------------------
+
+-- Set meaningful title when creating new panes
+wezterm.on('open-uri', function(window, pane, uri)
+  local domain = pane.domain_name
+  if domain and domain ~= "local" then
+    pane:set_title("ssh: " .. domain)
+  end
+end)
+
+-- Ensure new panes have correct title
+wezterm.on('spawn-command', function(window, pane, args)
+  local cmd = args.args and args.args[1] or ""
+  if cmd:find("ssh") then
+    wezterm.time.call_after(1, function()
+      local domain = pane.domain_name
+      if domain and domain ~= "local" then
+        pane:set_title("ssh: " .. domain)
+      end
+    end)
+  end
+end)
+
+-------------------------------------------------------------------------------
+-- SECTION 12: STATUS BAR WITH ROUNDED CORNERS
+-------------------------------------------------------------------------------
+
+-- Update status bar with rounded corners
+wezterm.on('update-status', function(window, pane)
+  local time = wezterm.strftime("%H:%M")
+  local date = wezterm.strftime("%Y-%m-%d")
+  
+  -- Right side: time with rounded corners
+  local right_status = wezterm.format({
+    -- Left corner: transition from tab bar background to dark blue-gray
+    { Foreground = { Color = "#1a1a2e" } },    -- Dark blue-gray foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = left_corner },
+    
+    -- Content: dark blue-gray background, purple text
+    { Background = { Color = "#1a1a2e" } },    -- Dark blue-gray background
+    { Foreground = { Color = "#666699" } },    -- Purple text
+    { Text = " " .. time .. " " },
+    
+    -- Right corner: transition from dark blue-gray to tab bar background
+    { Foreground = { Color = "#1a1a2e" } },    -- Dark blue-gray foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = right_corner },
+
+    -- Left corner: transition from tab bar background to orange
+    { Foreground = { Color = "#FF8C00" } },    -- Orange foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = left_corner },
+    
+    -- Tab content: orange background, black text
+    { Background = { Color = "#FF8C00" } },    -- Orange background
+    { Foreground = { Color = "#000000" } },    -- Black text
+    { Text = " " .. date .. " " },
+    
+    -- Right corner: transition from orange to tab bar background
+    { Foreground = { Color = "#FF8C00" } },    -- Orange foreground (triangle color) 
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = right_corner },
+  })
+  
+  window:set_right_status(right_status)
+end)
+
+-------------------------------------------------------------------------------
+-- SECTION 13: ADDITIONAL CONFIGURATIONS
+-------------------------------------------------------------------------------
+
+-- Quick select mode
+config.quick_select_patterns = {
+  -- Select and copy URLs
+  '[a-zA-Z]+://[0-9a-zA-Z-.]+(/[0-9a-zA-Z_\\-./?=&%#]*)?',
+  -- Select and copy email addresses
+  '\\b\\w+@[\\w-]+(\\.[\\w-]+)+\\b',
+  -- Select and copy IP addresses
+  '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}',
+  -- Select and copy hex colors
+  '#[0-9a-fA-F]{6}',
+}
+
+-- Unicode input configuration
+config.use_ime = true
+config.use_dead_keys = false
+config.send_composed_key_when_left_alt_is_pressed = false
+config.send_composed_key_when_right_alt_is_pressed = true
+
+-- Bell configuration
+config.audible_bell = 'Disabled'
+config.visual_bell = {
+  fade_in_function = 'EaseIn',
+  fade_in_duration_ms = 50,
+  fade_out_function = 'EaseOut',
+  fade_out_duration_ms = 50,
+  target = 'CursorColor',
+}
+
+-- Tab bar appearance
+config.show_tabs_in_tab_bar = true
+config.tab_bar_style = {
+  new_tab = wezterm.format {
+    -- Left corner: transition from tab bar background to dark blue-gray
+    { Foreground = { Color = "#1a1a2e" } },    -- Dark blue-gray foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = left_corner },
+    
+    -- Content: dark blue-gray background, purple text
+    { Background = { Color = "#1a1a2e" } },    -- Dark blue-gray background
+    { Foreground = { Color = "#666699" } },    -- Purple text
+    { Text = " " .. ' + ' .. " " },
+    
+    -- Right corner: transition from dark blue-gray to tab bar background
+    { Foreground = { Color = "#1a1a2e" } },    -- Dark blue-gray foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = right_corner },
+  },
+  new_tab_hover = wezterm.format {
+    { Foreground = { Color = "#FF8C00" } },    -- Orange foreground (triangle color)
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = left_corner },
+    
+    -- Tab content: orange background, black text
+    { Background = { Color = "#FF8C00" } },    -- Orange background
+    { Foreground = { Color = "#000000" } },    -- Black text
+    { Text = " " .. ' + ' .. " " },
+    { Attribute = { Italic = true } },
+    
+    -- Right corner: transition from orange to tab bar background
+    { Foreground = { Color = "#FF8C00" } },    -- Orange foreground (triangle color) 
+    { Background = { Color = "#0a0a14" } },    -- Tab bar background
+    { Text = right_corner },
+    
+  },
+}
 
 -------------------------------------------------------------------------------
 -- RETURN CONFIGURATION
